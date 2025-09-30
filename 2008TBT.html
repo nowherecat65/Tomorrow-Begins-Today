@@ -12,138 +12,154 @@ campaignTrail_temp.difficulty_level_json = JSON.parse("[{\"model\": \"campaign_t
 
 campaignTrail_temp.credits = 'u/Verbluffen and u/campaigntrailaccount';
 
-// Edwards '08 palette — blue + green only (structure unchanged)
-nct_stuff.themes[nct_stuff.selectedTheme].coloring_title  = "#0A74B3";   // Edwards blue (header)
-nct_stuff.themes[nct_stuff.selectedTheme].coloring_window = "#F7FAFD";   // NEW: cool paper base (no gradient)
+//#startcode  ——— Edwards ’08 reskin (structure unchanged, 7.css kept)
+
+// 1) Core palette tokens
+const ED_BLUE   = "#0A74B3";   // Edwards blue
+const ED_BLUE_2 = "#1186CC";   // mid blue
+const ED_BLUE_3 = "#0A6AA5";   // deep shade
+const ED_GREEN  = "#2FB24A";   // Edwards green (swoosh)
+const ED_LIGHT  = "#F7FAFD";   // light paper-blue window base
+const ED_GRAY   = "#E4EEF6";   // hairline border
+
+// 2) Theme object + immediate surface sync
+nct_stuff.themes[nct_stuff.selectedTheme].coloring_title  = ED_BLUE;
+nct_stuff.themes[nct_stuff.selectedTheme].coloring_window = ED_LIGHT;
 
 document.getElementsByClassName("game_header")[0].style.backgroundColor =
   nct_stuff.themes[nct_stuff.selectedTheme].coloring_title;
 
-// Apply non-gradient window surface with refined micro-texture + depth
-(() => {
-  const gw = document.querySelector("#game_window");
-  if (!gw) return;
+$("#game_window")[0].style.backgroundColor =
+  nct_stuff.themes[nct_stuff.selectedTheme].coloring_window;
 
-  // Solid base
-  gw.style.backgroundColor = nct_stuff.themes[nct_stuff.selectedTheme].coloring_window;
-
-  // Super-subtle diagonal pinstripe + micro-dot (SVG tile, no gradients)
-  const tile = encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" shape-rendering="crispEdges">
-      <!-- 1px diagonal pinstripe in Edwards blue, very faint -->
-      <path d="M0 13 L13 0" stroke="#0A74B3" stroke-opacity="0.06" stroke-width="1"/>
-      <!-- micro dot in mid-blue, ultra faint -->
-      <circle cx="10.5" cy="10.5" r="0.8" fill="#1186CC" fill-opacity="0.07"/>
-    </svg>
-  `);
-
-  gw.style.backgroundImage = `url("data:image/svg+xml,${tile}")`;
-  gw.style.backgroundRepeat = "repeat";
-  gw.style.backgroundSize = "14px 14px";
-
-  // Depth: crisp card feel that plays well with the bold outer gradients
-  gw.style.border = "1px solid #E4EEF6";                // hairline border
-  gw.style.borderRadius = "4px";
-  gw.style.boxShadow =
-    "inset 0 1px 0 rgba(255,255,255,0.65), 0 2px 8px rgba(10, 26, 46, 0.06)";
-})();
-
-// Keep your existing hero backdrop (gradients elsewhere stay bold)
+// 3) Page backdrop: bold, brandy hero (kept as a gradient like the rest of your app)
 $(".container")[0].style.background =
   "radial-gradient(120% 60% at 50% -10%, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 55%), \
    linear-gradient(180deg, #0A74B3 0%, #1186CC 36%, #2FB24A 100%)";
 
-// Style layer: keep headers/sections consistent with the Edwards identity
-let style = document.createElement('style');
-style.type = 'text/css';
-style.id = 'dynamic-style';
+// 4) Keep your Windows 7 skin (7.css)
+document.head.innerHTML += `<link
+  rel="stylesheet"
+  href="https://unpkg.com/7.css"
+>`;
 
-style.innerHTML = `
-/* Start panel (unchanged): bold brand motion lives here */
-.campaign_trail_start_emphasis{
-  background:
-    linear-gradient(135deg, rgba(255,255,255,0.30), rgba(255,255,255,0) 60%),
-    linear-gradient(135deg, #0A74B3 0%, #1692D8 50%, #2FB24A 100%);
+// 5) Edwards ’08 visual system (no layout changes)
+document.head.innerHTML += `<style id="edwards-08-theme">
+  /* Typography + neutral surface */
+  h3 { font-size: 1.17em !important; }
+  body { display:flex !important; }
+  #game_window { max-width: 1000px; }
+
+  /* Header bar: solid Edwards blue with a crisp green “swoosh” underline */
+  .game_header {
+    background: linear-gradient(180deg, ${ED_BLUE} 0%, ${ED_BLUE_3} 100%) !important;
+    border-bottom: 3px solid ${ED_GREEN} !important;
+    color: #FFFFFF !important;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.25);
+  }
+
+  /* Window/card: premium but quiet (no gradient), plays nicely with bold page gradient */
+  #game_window {
+    background-color: ${ED_LIGHT} !important;
+    border: 1px solid ${ED_GRAY};
+    border-radius: 4px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.60),
+      0 2px 8px rgba(10, 26, 46, 0.06);
+    /* optional: faint micro-texture for life, but no gradient */
+    background-image: url("data:image/svg+xml,${encodeURIComponent(`
+      <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' shape-rendering='crispEdges'>
+        <path d='M0 15 L15 0' stroke='${ED_BLUE}' stroke-opacity='0.05' stroke-width='1'/>
+        <circle cx='11.5' cy='11.5' r='0.8' fill='${ED_GREEN}' fill-opacity='0.06'/>
+      </svg>
+    `)}");
+    background-repeat: repeat;
+    background-size: 16px 16px;
+  }
+
+  /* Section bars: blue blocks with green underline for brand continuity */
+  #state_info h3,
+  #state_result h3,
+  #overall_result h3 {
+    background: linear-gradient(180deg, ${ED_BLUE} 0%, ${ED_BLUE_3} 100%);
+    border-bottom: 3px solid ${ED_GREEN};
+    color: #FFFFFF;
+  }
+
+  /* Light surfaces: match the window base; keep green rule */
+  .overlay_window h3,
+  .inner_window_question h3 {
+    background-color: ${ED_LIGHT};
+    border-bottom: 2px solid ${ED_GREEN};
+    color: #0B2436; /* clear readability on light */
+  }
+  #overall_result_container,
+  #state_result_container {
+    background-color: ${ED_LIGHT};
+    border: 1px solid ${ED_GRAY};
+    border-radius: 4px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+
+  /* Campaign sign (if present): clean logo on white */
+  #campaign_sign {
+    background-image: url("John_Edwards_Campaign_Logo (2).svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    background-color: #FFFFFF;
+    border-color: #c9c9c9;
+    border-width: .01em;
+    margin: 0 auto;
+    width: 100%;
+    height: 104px;
+    margin-left: -0.033em;
+    margin-right: -0.033em;
+  }
+  #campaign_sign p { color: rgba(0,0,0,0); }
+
+  /* Neutral frame so the logo colors pop */
+  .inner_window_sign_display {
+    background-color: #FFFFFF;
+    border-style: double;
+    border-color: #C9C9C9;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+  }
+
+  /* Map well polish */
+  #map_container {
+    background: #F8F8F8;
+    border-radius: 1px;
+    box-shadow:
+      inset 0 0 4px rgba(0, 0, 0, 0.08),
+      0 0 0 2px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+  }
+
+  /* Menu tray aligns with the light base */
+  #menu_container { background-color: ${ED_LIGHT} !important; }
+
+  /* Links stay neutral for legibility */
+  a:-webkit-any-link { color: #000000; }
+</style>`;
+
+// 6) Your original readability overrides — adjusted to dark text on light panels
+function addDynamicCSS() {
+  var css = `
+    #final_results_description h3,
+    #overall_details_container h3,
+    #overall_election_details h4,
+    #main_content_area_reading p,
+    #main_content_area_reading h3.results_tab_header,
+    .inner_window_w_desc h3 {
+      color: #0B2436; /* deep ink on light surfaces */
+    }
+  `;
+  var styleElem = document.createElement('style');
+  styleElem.type = 'text/css';
+  styleElem.appendChild(document.createTextNode(css));
+  document.head.appendChild(styleElem);
 }
-
-/* Section headers: deep blue with green underline */
-#state_info h3,
-#state_result h3,
-#overall_result h3 {
-  background: linear-gradient(180deg, #0A74B3 0%, #0A6AA5 100%);
-  border-bottom: 3px solid #2FB24A;
-  color: #FFFFFF;
-}
-
-/* Campaign sign: Edwards 2008 mark, centered */
-#campaign_sign {
-  background-image: url("John_Edwards_Campaign_Logo (2).svg");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  background-color: #FFFFFF;
-  border-color: #c9c9c9;
-  border-width: .01em;
-  margin: 0 auto;
-  width: 100%;
-  height: 104px;
-  margin-left: -0.033em;
-  margin-right: -0.033em;
-}
-#campaign_sign p { color: rgb(0 0 0 / 0%); }
-
-/* Neutral frame so the logo colors pop */
-.inner_window_sign_display {
-  margin: 0;
-  margin-right: 0.033px;
-  margin-left: 0.033px;
-  position: relative;
-  width: 35%;
-  height: 28%;
-  background-color: #FFFFFF;
-  margin-left: auto;
-  margin-right: auto;
-  border-style: double;
-  border-color: #C9C9C9;
-}
-
-/* Breathing room for the map footer */
-#map_footer { padding-top: 3em; }
-
-/* Section bodies: match the window card look (no gradients) */
-.overlay_window h3,
-.inner_window_question h3 {
-  background-color: #F7FAFD;               /* match window base */
-  border-bottom: 2px solid #2FB24A;        /* green continuity */
-}
-
-#overall_result_container,
-#state_result_container {
-  background-color: #F7FAFD;               /* match window base */
-  border: 1px solid #E4EEF6;
-  border-radius: 4px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
-}
-
-/* Map container: light polish */
-#map_container {
-  background: #F8F8F8;
-  border-radius: 1px;
-  box-shadow:
-    inset 0 0 4px rgba(0, 0, 0, 0.08),
-    0 0 0 2px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
-}
-
-/* Overlays */
-.overlay_window { height: auto; }
-
-/* Menu tray: align with the new base */
-#menu_container { background-color: #F7FAFD !important; }
-
-/* Links: neutral for legibility */
-a:-webkit-any-link { color: #000000; }
-`;
-
-document.head.appendChild(style);
+addDynamicCSS();
 
