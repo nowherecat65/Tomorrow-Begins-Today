@@ -89,7 +89,7 @@ document.head.innerHTML += `<style id="edwards-08-theme">
   /* Light surfaces: match the window base; keep green rule */
   .overlay_window h3,
   .inner_window_question h3 {
-    background-color: ${ED_LIGHT};
+    background-color: #BDD6E5;
     border-bottom: 2px solid ${ED_GREEN};
     color: #0B2436; /* clear readability on light */
   }
@@ -146,6 +146,12 @@ document.head.innerHTML += `<style id="edwards-08-theme">
   #inner_window_3 {
     background: #f7fafd;
   }
+
+  .campaign_trail_start_emphasis{
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.30), rgba(255,255,255,0) 60%),
+    linear-gradient(135deg, #0A74B3 0%, #1692D8 50%, #2FB24A 100%);
+}
 
     /* intro windows */
   #inner_window_4 {
